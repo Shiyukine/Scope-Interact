@@ -1,0 +1,2 @@
+rootProject.name='Scope Interact'
+include ':app'
