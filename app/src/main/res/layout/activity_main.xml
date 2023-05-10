@@ -72,23 +72,6 @@
                 a:text="Settings" />
 
             <CheckBox
-                a:id="@+id/osu"
-                a:layout_width="wrap_content"
-                a:layout_height="wrap_content"
-                a:layout_marginStart="10dp"
-                a:onClick="osu_click"
-                a:text="osu! mode (does not display stylus functions + use mouse)" />
-
-            <CheckBox
-                a:id="@+id/automc"
-                a:layout_width="wrap_content"
-                a:layout_height="wrap_content"
-                a:onClick="mouse_click"
-                a:checked="true"
-                a:layout_marginStart="10dp"
-                a:text="Auto mouse click" />
-
-            <CheckBox
                 a:id="@+id/revert"
                 a:layout_width="wrap_content"
                 a:layout_height="wrap_content"
@@ -104,24 +87,6 @@
                 a:onClick="useHist"
                 a:layout_marginStart="10dp"
                 a:text="Be more precise" />
-
-            <TextView
-                a:layout_width="wrap_content"
-                a:layout_height="wrap_content"
-                a:layout_marginStart="10dp"
-                a:textSize="20sp"
-                a:textColor="@color/colorPrimary"
-                a:layout_marginTop="20dp"
-                a:text="Other"
-                a:onClick="showOrHideOther"/>
-
-            <TextView
-                a:layout_width="wrap_content"
-                a:layout_height="wrap_content"
-                a:layout_marginStart="10dp"
-                a:textSize="12sp"
-                a:textColor="#979797"
-                a:text="Click on &quot;Other&quot; to hide or reveal" />
 
             <LinearLayout
                 a:layout_width="match_parent"

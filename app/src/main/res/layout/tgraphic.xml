@@ -12,19 +12,19 @@
         a:layout_width="wrap_content"
         a:layout_height="wrap_content"
         a:layout_centerHorizontal="true"
-        a:layout_marginTop="100dp"
+        a:layout_marginTop="150dp"
         a:id="@+id/gl_main">
-    <ImageButton
-        a:layout_width="150dp"
-        a:layout_height="200dp"
-        a:src="@drawable/back"
-        a:tag="key-1"
-        a:id="@+id/key_1"
-        a:contentDescription="@string/app_name"/>
+        <ImageButton
+            a:layout_width="150dp"
+            a:layout_height="300dp"
+            a:src="@drawable/back"
+            a:tag="key-1"
+            a:id="@+id/key_1"
+            a:contentDescription="@string/app_name"/>
 
         <ImageButton
             a:layout_width="150dp"
-            a:layout_height="200dp"
+            a:layout_height="300dp"
             a:layout_marginLeft="10dp"
             a:src="@drawable/eraser"
             a:tag="key-2"
@@ -37,9 +37,8 @@
         a:id="@+id/settingst"
         a:layout_width="48dp"
         a:layout_height="48dp"
-        a:layout_alignParentStart="true"
         a:layout_alignParentBottom="true"
-        a:layout_marginStart="150dp"
+        a:layout_centerHorizontal="true"
         a:layout_marginBottom="20dp"
         a:contentDescription="@string/app_name"
         a:src="@drawable/settings"
@@ -51,7 +50,7 @@
         a:layout_width="200dp"
         a:layout_height="48dp"
         a:layout_alignParentBottom="true"
-        a:layout_marginStart="75dp"
+        a:layout_centerHorizontal="true"
         a:layout_marginBottom="70dp"
         a:visibility="gone"
         a:background="#5C5C5C"
@@ -59,7 +58,7 @@
         a:clickable="true">
 
         <TextView
-            a:text="Pressure intensifier :"
+            a:text="Sensivity :"
             a:layout_gravity="center"/>
         <SeekBar
             a:layout_height="wrap_content"

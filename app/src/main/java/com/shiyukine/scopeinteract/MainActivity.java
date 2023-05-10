@@ -1,11 +1,5 @@
 package com.shiyukine.scopeinteract;
 
-import static android.util.Half.EPSILON;
-
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-import static java.lang.Math.sqrt;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -13,10 +7,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,14 +17,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,14 +34,14 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.text.DecimalFormat;
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity {
     public static boolean osuM = false;
     public static String version = "";
     public static int verCode = -1;
-    public static int revision = 1;
+    public static int revision = 0;
     public static boolean automc = true;
     public static boolean revert = false;
     public static boolean histEv = true;
@@ -81,16 +69,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         //
-        if(settings.contains("osuM"))
-        {
-            osuM = settings.getBoolean("osuM", false);
-            ((CheckBox)findViewById(R.id.osu)).setChecked(osuM);
-        }
-        if(settings.contains("automc"))
-        {
-            automc = settings.getBoolean("automc", false);
-            ((CheckBox)findViewById(R.id.automc)).setChecked(automc);
-        }
         if(settings.contains("revert"))
         {
             revert = settings.getBoolean("revert", false);
@@ -239,45 +217,51 @@ public class MainActivity extends AppCompatActivity {
         searchUpd();
     }
 
+    @SuppressLint("StaticFieldLeak")
     private void searchUpd()
     {
-        webView = new WebView(MainActivity.this);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(new WebViewClient() {
+        new GetUpdates() {
             @Override
-            public void onPageFinished(WebView view, String url) {
-                webView.evaluateJavascript("document.body.innerText", new ValueCallback<String>() {
+            public void onPostExecute(String result) {
+                webView = new WebView(MainActivity.this);
+                webView.getSettings().setJavaScriptEnabled(true);
+                webView.setWebViewClient(new WebViewClient() {
                     @Override
-                    public void onReceiveValue(String value) {
-                        try {
-                            StringBuilder val = new StringBuilder(value);
-                            val.deleteCharAt(0);
-                            val.deleteCharAt(val.length() - 1);
-                            if(Integer.parseInt(val.toString().split("\\\\n")[0]) > MainActivity.verCode) {
-                                Log.d("Update", "Available update " + MainActivity.verCode + " -> " + val.toString());
-                                Toast.makeText(MainActivity.this, "An update is available.", Toast.LENGTH_SHORT).show();
-                                urlUpdate = val.toString().split("\\\\n")[1];
-                                MainActivity.this.updapp();
+                    public void onPageFinished(WebView view, String url) {
+                        webView.evaluateJavascript("document.body.innerText", new ValueCallback<String>() {
+                            @Override
+                            public void onReceiveValue(String value) {
+                                try {
+                                    StringBuilder val = new StringBuilder(value);
+                                    val.deleteCharAt(0);
+                                    val.deleteCharAt(val.length() - 1);
+                                    if (Integer.parseInt(val.toString().split("\\\\n")[0]) > MainActivity.verCode) {
+                                        Log.d("Update", "Available update " + MainActivity.verCode + " -> " + val.toString());
+                                        Toast.makeText(MainActivity.this, "An update is available.", Toast.LENGTH_SHORT).show();
+                                        urlUpdate = val.toString().split("\\\\n")[1];
+                                        MainActivity.this.updapp();
+                                    } else
+                                        Toast.makeText(MainActivity.this, "No new updates.", Toast.LENGTH_SHORT).show();
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                    Snackbar.make(findViewById(android.R.id.content), "Can't search updates.", Snackbar.LENGTH_LONG)
+                                            .show();
+                                }
                             }
-                            else Toast.makeText(MainActivity.this, "No new updates.", Toast.LENGTH_SHORT).show();
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Snackbar.make(findViewById(android.R.id.content), "Can't search updates.", Snackbar.LENGTH_LONG)
-                                    .show();
-                        }
+                        });
+                        super.onPageFinished(view, url);
                     }
                 });
-                super.onPageFinished(view, url);
+                webView.loadUrl(result + "dl/Scope Interact/update_c.php");
             }
-        });
-        webView.loadUrl("http://" + settings.getString("Url_Server", "aketsuky.eu") + "/dl/TouchTransporter/update_c.php");
+        }.execute();
     }
 
     public void updapp()
     {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://" + urlUpdate + "/dl/TouchTransporter/touchtransporter.apk"));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlUpdate));
         startActivity(browserIntent);
     }
 

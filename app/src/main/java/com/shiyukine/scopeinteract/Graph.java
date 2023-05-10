@@ -90,8 +90,6 @@ public class Graph extends AppCompatActivity {
             });
             g = this;
             //settings tgraph
-            //ancient setting
-            findViewById(R.id.settingst).setVisibility(View.GONE);
             ViewGroup vg2 = findViewById(R.id.gl_main);
             for (int i = 0; i < vg2.getChildCount(); i++) {
                 View v = vg2.getChildAt(i);
@@ -162,7 +160,9 @@ public class Graph extends AppCompatActivity {
                 deltaRotationVector[1] = sinThetaOverTwo * axisY;
                 deltaRotationVector[2] = sinThetaOverTwo * axisZ;
                 deltaRotationVector[3] = cosThetaOverTwo;
-                new SendInfo().execute("move:" + Double.valueOf(decForm.format(axisX)) + ";" + Double.valueOf(decForm.format(axisY)) + ";" + Double.valueOf(decForm.format(axisZ)) + "|");
+                if(isMove) {
+                    new SendInfo().execute("move:" + axisX + ";" + axisY + ";" + axisZ + "|");
+                }
             }
             timestamp = event.timestamp;
             float[] deltaRotationMatrix = new float[9];
@@ -186,6 +186,7 @@ public class Graph extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         try {
+            sensorManager.unregisterListener(sensorListener);
             if(socket != null) {
                 socket.close();
             }
@@ -194,13 +195,17 @@ public class Graph extends AppCompatActivity {
         }
     }
 
+    int sampling = SensorManager.SENSOR_DELAY_GAME;
+
     public void onResume() {
         //for new api versions.
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
         super.onResume();
-        sensorManager.registerListener(sensorListener, sensor, SensorManager.SENSOR_DELAY_UI);
+        if(MainActivity.histEv) sampling = SensorManager.SENSOR_DELAY_GAME;
+        else sampling = SensorManager.SENSOR_DELAY_UI;
+        sensorManager.registerListener(sensorListener, sensor, sampling);
     }
 
     View.OnTouchListener touchkey =  new View.OnTouchListener() {
@@ -213,15 +218,15 @@ public class Graph extends AppCompatActivity {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             new SendInfo().execute(ib.getTag() + "-kdown|", g);
-                            isMove = ((String)view.getTag()).contains("key-2");
+                            if(((String)view.getTag()).contains("key-2")) isMove = true;
                             keyPressed = true;
-                            return true;
+                            return false;
 
                         case MotionEvent.ACTION_UP:
                             new SendInfo().execute(ib.getTag() + "-kup|", g);
                             if(((String)view.getTag()).contains("key-2")) isMove = false;
                             keyPressed = false;
-                            return true;
+                            return false;
                     }
                 }
             }
@@ -229,7 +234,7 @@ public class Graph extends AppCompatActivity {
                 e.printStackTrace();
                 Log.e("Error", "E" + e.getMessage());
             }
-            return true;
+            return false;
         }
     };
 
