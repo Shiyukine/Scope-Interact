@@ -9,7 +9,7 @@ public class ConnectTcp extends AsyncTask<Object, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Object... objs) {
         try {
-            Graph.socket = new Socket((Graph.isUsb ? "127.0.0.1" : (String)objs[0]), 30921);
+            Graph.socket = new Socket((Graph.isUsb ? "127.0.0.1" : (String)objs[0]), 30931);
             Graph.output = new PrintWriter(Graph.socket.getOutputStream());
             return true;
         } catch (Exception e) {
