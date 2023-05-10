@@ -36,13 +36,13 @@ public class SendInfo extends AsyncTask<Object, Void, Boolean> {
                 String msg = (String)objects[0];
                 Graph.buf = msg.getBytes();
                 DatagramPacket packet
-                        = new DatagramPacket(Graph.buf, Graph.buf.length, Graph.address, 30921);
+                        = new DatagramPacket(Graph.buf, Graph.buf.length, Graph.address, 30931);
                 Graph.socketU.send(packet);
                 if(!MainActivity.osuM) {
                     counting++;
-                    if (counting == 5) {
+                    if (counting == 50) {
                         counting = 0;
-                        Graph.output.write("test");
+                        Graph.output.write("test|");
                         return !Graph.output.checkError();
                     }
                 }
