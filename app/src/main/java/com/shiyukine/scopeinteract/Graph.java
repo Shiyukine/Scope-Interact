@@ -104,7 +104,7 @@ public class Graph extends AppCompatActivity {
                 MessageQueue.IdleHandler handler = new MessageQueue.IdleHandler() {
                     @Override
                     public boolean queueIdle() {
-                        new SendInfo().execute("ready:" + MainActivity.verCode + "|", g);
+                        new SendInfo().execute("ready:" + MainActivity.verCode + ";" + Graph.sensivity + "|", g);
                         return false;
                     }
                 };

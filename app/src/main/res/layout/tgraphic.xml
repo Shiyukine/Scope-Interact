@@ -65,10 +65,8 @@
             a:layout_width="match_parent"
             a:layout_row="1"
             a:layout_column="0"
-            a:min="0"
-            style="@style/Widget.AppCompat.SeekBar.Discrete"
-            a:max="10"
-            a:tickMark="@drawable/tickmark"
+            a:min="1"
+            a:max="50"
             a:id="@+id/pressbar"/>
     </GridLayout>
 </RelativeLayout>
