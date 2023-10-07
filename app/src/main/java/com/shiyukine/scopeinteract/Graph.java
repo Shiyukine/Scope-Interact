@@ -99,6 +99,7 @@ public class Graph extends AppCompatActivity {
             }
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+            linearSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
             if(!isSet) {
                 //send info when activity loaded
                 MessageQueue.IdleHandler handler = new MessageQueue.IdleHandler() {
@@ -118,11 +119,17 @@ public class Graph extends AppCompatActivity {
 
     // Create a constant to convert nanoseconds to seconds.
     private static final float NS2S = 1.0f / 1000000000.0f;
+
+    // Create a constant to convert nanoseconds to milliseconds.
+    private static final float NS2MS = 1.0f / 1000000.0f;
     private final float[] deltaRotationVector = new float[4];
     private float timestamp;
+    private float timestamp2;
 
     private SensorManager sensorManager;
     private Sensor sensor;
+    private Sensor linearSensor;
+    private float rotationCurrent;
 
     DecimalFormat decForm = new DecimalFormat("#.###");
 
@@ -169,7 +176,27 @@ public class Graph extends AppCompatActivity {
             SensorManager.getRotationMatrixFromVector(deltaRotationMatrix, deltaRotationVector);
             // User code should concatenate the delta rotation we computed with the current rotation
             // in order to get the updated rotation.
-            // rotationCurrent = rotationCurrent * deltaRotationMatrix;
+            //rotationCurrent = rotationCurrent * deltaRotationMatrix;
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+        }
+    };
+
+    private final SensorEventListener linearSensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if(timestamp2 != 0) {
+                float dT = (event.timestamp - timestamp2) * NS2MS;
+                float axisX = event.values[0];
+                float axisY = event.values[1];
+                float axisZ = event.values[2];
+                if (isMove) {
+                    new SendInfo().execute("linear:" + axisX + ";" + axisY + ";" + axisZ + ";" + dT + "|");
+                }
+            }
+            timestamp2 = event.timestamp;
         }
 
         @Override
@@ -181,12 +208,14 @@ public class Graph extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(sensorListener);
+        sensorManager.unregisterListener(linearSensorListener);
     }
 
     public void onBackPressed() {
         super.onBackPressed();
         try {
             sensorManager.unregisterListener(sensorListener);
+            sensorManager.unregisterListener(linearSensorListener);
             if(socket != null) {
                 socket.close();
             }
@@ -206,6 +235,7 @@ public class Graph extends AppCompatActivity {
         if(MainActivity.histEv) sampling = SensorManager.SENSOR_DELAY_GAME;
         else sampling = SensorManager.SENSOR_DELAY_UI;
         sensorManager.registerListener(sensorListener, sensor, sampling);
+        sensorManager.registerListener(linearSensorListener, linearSensor, sampling);
     }
 
     View.OnTouchListener touchkey =  new View.OnTouchListener() {
