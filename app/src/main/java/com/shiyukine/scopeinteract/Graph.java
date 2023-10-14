@@ -123,8 +123,8 @@ public class Graph extends AppCompatActivity {
     // Create a constant to convert nanoseconds to milliseconds.
     private static final float NS2MS = 1.0f / 1000000.0f;
     private final float[] deltaRotationVector = new float[4];
-    private float timestamp;
-    private float timestamp2;
+    private double timestamp;
+    private double timestamp2;
 
     private SensorManager sensorManager;
     private Sensor sensor;
@@ -139,7 +139,7 @@ public class Graph extends AppCompatActivity {
             // This timestep's delta rotation to be multiplied by the current rotation
             // after computing it from the gyro sample data.
             if (timestamp != 0) {
-                final float dT = (event.timestamp - timestamp) * NS2S;
+                final double dT = (event.timestamp - timestamp) * NS2S;
                 // Axis of the rotation sample, not normalized yet.
                 float axisX = event.values[0];
                 float axisY = event.values[1];
@@ -160,7 +160,7 @@ public class Graph extends AppCompatActivity {
                 // in order to get a delta rotation from this sample over the timestep
                 // We will convert this axis-angle representation of the delta rotation
                 // into a quaternion before turning it into the rotation matrix.
-                float thetaOverTwo = omegaMagnitude * dT / 2.0f;
+                double thetaOverTwo = omegaMagnitude * dT / 2.0f;
                 float sinThetaOverTwo = (float) sin(thetaOverTwo);
                 float cosThetaOverTwo = (float) cos(thetaOverTwo);
                 deltaRotationVector[0] = sinThetaOverTwo * axisX;
@@ -188,10 +188,12 @@ public class Graph extends AppCompatActivity {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if(timestamp2 != 0) {
-                float dT = (event.timestamp - timestamp2) * NS2MS;
+                double dT = (event.timestamp - timestamp2) * NS2MS;
                 float axisX = event.values[0];
                 float axisY = event.values[1];
                 float axisZ = event.values[2];
+                float omegaMagnitude = (float) sqrt(axisX*axisX + axisY*axisY + axisZ*axisZ);
+                //Log.e("gfgdfsgdsg6", omegaMagnitude + "");
                 if (isMove) {
                     new SendInfo().execute("linear:" + axisX + ";" + axisY + ";" + axisZ + ";" + dT + "|");
                 }
